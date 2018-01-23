@@ -16,13 +16,17 @@ data Form = Var Char | Not Form | And Form Form | Or Form Form
 -- validTree (Node False t1 t2) = False
 
 --so the tree keeps track of the rules that it has left to apply
-
 growTree :: Tree [Form] -> Tree [Form]
 growTree Leaf = Leaf
-growTree (Node (f:fs) Leaf Leaf) = case f of 
-    And f1 f2    -> (Node (f1 : f2 : fs) Leaf Leaf)
-    Or f1 f2     -> (Node fs (Node (f1:fs) Leaf Leaf) (Node (f2:fs) Leaf Leaf))
-    Not (Not f') -> (Node (f':fs) Leaf Leaf)
+growTree (Node (f:fs) b1 b2) = case f of 
+    And f1 f2    -> (Node (f1 : f2 : fs) b1 b2)
+    Or f1 f2     -> (Node fs (addToTree b1 f1) (addToTree b2 f2))
+    Not (Not f') -> (Node (f':fs) b1 b2)
+
+--This will add the given Form to the list of Forms in the point at the tree.
+addToTree :: Tree [Form] -> Form -> Tree [Form]
+addToTree Leaf f = Node [f] Leaf Leaf
+addToTree (Node fs t1 t2) f = Node (f:fs) t1 t2
 
 doubleNeg :: Form -> Form
 doubleNeg (Not (Not f)) = f
