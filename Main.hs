@@ -19,9 +19,11 @@ data Form = Var Char | Not Form | And Form Form | Or Form Form
 growTree :: Tree [Form] -> Tree [Form]
 growTree Leaf = Leaf
 growTree (Node (f:fs) b1 b2) = case f of 
-    And f1 f2    -> (Node (f1 : f2 : fs) b1 b2)
-    Or f1 f2     -> (Node fs (addToTree b1 f1) (addToTree b2 f2))
-    Not (Not f') -> (Node (f':fs) b1 b2)
+    And f1 f2       -> (Node (f1 : f2 : fs) b1 b2)
+    Or f1 f2        -> (Node fs (addToTree b1 f1) (addToTree b2 f2))
+    Not (Or f1 f2)  -> (Node ((Not f1) : (Not f2) : fs) b1 b2)
+    Not (And f1 f2) -> (Node fs (addToTree b1 (Not f1)) (addToTree b2 (Not f2)))
+    Not (Not f')    -> (Node (f':fs) b1 b2)
 
 --This will add the given Form to the list of Forms in the point at the tree.
 addToTree :: Tree [Form] -> Form -> Tree [Form]
