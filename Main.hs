@@ -1,5 +1,10 @@
 data Tree a = Node a (Tree a) (Tree a) | Leaf deriving Show
 
+instance Functor Tree where
+    fmap f (Node a t1 t2) = Node (f a) (fmap f t1) (fmap f t2)
+    fmap f Leaf = Leaf
+    
+
 data Form = Var Char | Not Form | And Form Form | Or Form Form
     deriving Show
 
@@ -16,3 +21,7 @@ growTree :: Tree [Form] -> Tree [Form]
 growTree Leaf = Leaf
 growTree (Node (f:fs) Leaf Leaf) = case f of 
     Not (Not f') -> (Node (f':fs) Leaf Leaf)
+
+doubleNeg :: Form -> Form
+doubleNeg (Not (Not f)) = f
+doubleNeg f = f
