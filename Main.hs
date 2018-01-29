@@ -37,10 +37,12 @@ applyZRule :: ZTree Form -> ZTree Form
 applyZRule (Node z bl br) = case cursor z of
     -- Not (Or (f1) (f2)) -> (Node (insert (Not f1) (insert (Not f2) (right z))) bl br)
     Var c                -> Node (right z) bl br
+    Not (Var c)          -> Node (right z) bl br
     And f1 f2            -> Node (insert f1 (insert f2 (right z))) bl br
     Or f1 f2             -> doubleZRule (Node (right z) bl br) (Or f1 f2)
+    Not (And f1 f2)      -> doubleZRule (Node (right z) bl br) (Not (And f1 f2))
     Not (Or f1 f2)       -> Node (insert (Not f1) (insert (Not f2) (right z))) bl br
-    _ -> Leaf
+    
     
 
 
@@ -58,7 +60,8 @@ doubleRule (Node fs b1 b2) f = Node fs (doubleRule b1 f) (doubleRule b2 f)
 doubleZRule :: ZTree Form -> Form -> ZTree Form
 doubleZRule Leaf _ = Leaf  --This case shouldn't happen 
 doubleZRule (Node z Leaf Leaf) f = case f of 
-    Or f1 f2 -> Node z (Node (fromList [f1]) Leaf Leaf) (Node (fromList [f2]) Leaf Leaf)
+    Or f1 f2        -> Node z (Node (fromList [f1]) Leaf Leaf) (Node (fromList [f2]) Leaf Leaf)
+    Not (And f1 f2) -> Node z (Node (fromList [Not (f1)]) Leaf Leaf) (Node (fromList [Not (f2)]) Leaf Leaf)
 doubleZRule (Node z bl br) f = Node z (doubleZRule bl f) (doubleZRule br f)
 
 
