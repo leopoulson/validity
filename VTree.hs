@@ -1,5 +1,11 @@
 module VTree where
 
+-- TODO:
+-- Implement something for double negatives
+-- Think about what'd happen when you have a branch with one child?
+--  ♦︎  This would of course enver happen in reality but still worth keeping in mind
+
+
 import Zipper
 
 data Tree a = Node a (Tree a) (Tree a) | Leaf 
@@ -54,8 +60,20 @@ doubleNeg :: Form -> Form
 doubleNeg (Not (Not f)) = f
 doubleNeg f = f
 
+accumulateTree :: ZTree Form -> [Form] -> ZTree Form
+accumulateTree Leaf _ = Leaf     -- Again, this should never happen
+accumulateTree (Node z Leaf Leaf) fs = Node (addAll z fs) Leaf Leaf
+accumulateTree (Node z bl br) fs = 
+    Node (fromList []) (accumulateTree bl ((toList z) ++ fs)) (accumulateTree br ((toList z) ++ fs))
 
+-- addALl :: Zipper Form -> [Form] -> Zipper Form
+-- addAll z fs = undefined
 
+addAll :: Zipper Form -> [Form] -> Zipper Form
+addAll z [] = z
+addAll z (f:fs) = addAll (insert f z) fs
+
+testAcTree = accumulateTree (Node (fromList [Var 'a']) (Node (fromList [Var 'e']) (Node (fromList [Var 'g']) Leaf Leaf) (Node (fromList [Var 'v']) Leaf Leaf)) (Node (fromList [Var 'b']) Leaf Leaf)) [Or (Var 'c') (Var 'd')]
 
 
 
