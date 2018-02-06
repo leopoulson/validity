@@ -17,7 +17,7 @@ instance Functor Tree where
     fmap f (Node a bl br) = Node (f a) (fmap f bl) (fmap f br)
 
 data Form = Var Char | Not Form | And Form Form | Or Form Form
-    deriving Show
+    deriving (Show, Eq)
     
 zipifyTree :: [Form] -> ZTree Form
 zipifyTree [] = Leaf
@@ -66,9 +66,8 @@ accumulateTree (Node z Leaf Leaf) fs = Node (addAll z fs) Leaf Leaf
 accumulateTree (Node z bl br) fs = 
     Node (fromList []) (accumulateTree bl ((toList z) ++ fs)) (accumulateTree br ((toList z) ++ fs))
 
--- addALl :: Zipper Form -> [Form] -> Zipper Form
--- addAll z fs = undefined
-
+-- Adds all of the elements in a list to a zipper
+-- TODO: Make it more Haskelly
 addAll :: Zipper Form -> [Form] -> Zipper Form
 addAll z [] = z
 addAll z (f:fs) = addAll (insert f z) fs

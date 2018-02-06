@@ -15,7 +15,17 @@ import VTree
 -- has to leaves for children, we can assume this to be the end of the branch.
 -- We then do the 'proving'.
 
--- So we need to collect all of the rules we get so far, and pass them onto the next one.
+-- So we need to take a Zipper of Forms, and then get a list of Forms
 
-traverseZTree :: ZTree Form -> [Form]
-traverseZTree = undefined
+checkTree :: ZTree Form -> Tree Bool
+checkTree t = fmap isValid t
+
+isValid :: Zipper Form -> Bool
+isValid z 
+  | endp z = True
+  | notf (cursor z) `elem` toList z = False
+  | otherwise = isValid (right z)
+
+notf :: Form -> Form
+notf (Not f) = f
+notf f = Not f
