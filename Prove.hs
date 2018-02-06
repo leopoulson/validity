@@ -18,7 +18,7 @@ import VTree
 -- So we need to take a Zipper of Forms, and then get a list of Forms
 
 checkTree :: ZTree Form -> Tree Bool
-checkTree t = fmap isValid t
+checkTree t = fmap (isValid . start) t
 
 isValid :: Zipper Form -> Bool
 isValid z 
