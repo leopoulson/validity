@@ -61,19 +61,19 @@ doubleNeg :: Form -> Form
 doubleNeg (Not (Not f)) = f
 doubleNeg f = f
 
-accumulateTree :: ZTree Form -> [Form] -> ZTree Form
-accumulateTree Leaf _ = Leaf     -- Again, this should never happen
-accumulateTree (Node z Leaf Leaf) fs = Node (addAll z fs) Leaf Leaf
-accumulateTree (Node z bl br) fs = 
-    Node (fromList []) (accumulateTree bl ((toList z) ++ fs)) (accumulateTree br ((toList z) ++ fs))
+accumulateTree :: [Form] -> ZTree Form -> ZTree Form
+accumulateTree _ Leaf = Leaf     -- Again, this should never happen
+accumulateTree fs (Node z Leaf Leaf) = Node (addAll fs z) Leaf Leaf
+accumulateTree fs (Node z bl br) = 
+    Node (fromList []) (accumulateTree ((toList z) ++ fs) bl) (accumulateTree ((toList z) ++ fs) br)
 
 -- Adds all of the elements in a list to a zipper
 -- TODO: Make it more Haskelly
-addAll :: Zipper Form -> [Form] -> Zipper Form
-addAll z [] = z
-addAll z (f:fs) = addAll (insert f z) fs
+addAll :: [Form] -> Zipper Form -> Zipper Form
+addAll [] z = z
+addAll (f:fs) z  = addAll fs (insert f z) 
 
-testAcTree = accumulateTree (Node (fromList [Var 'a']) (Node (fromList [Var 'e']) (Node (fromList [Var 'g']) Leaf Leaf) (Node (fromList [Var 'v']) Leaf Leaf)) (Node (fromList [Var 'b']) Leaf Leaf)) [Or (Var 'c') (Var 'd')]
+testAcTree = accumulateTree [Or (Var 'c') (Var 'd')] (Node (fromList [Var 'a']) (Node (fromList [Var 'e']) (Node (fromList [Var 'g']) Leaf Leaf) (Node (fromList [Var 'v']) Leaf Leaf)) (Node (fromList [Var 'b']) Leaf Leaf))
 
 
 
