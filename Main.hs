@@ -2,5 +2,5 @@ import Zipper
 import VTree
 import Prove
 
-prove :: [Form] -> Tree Bool
-prove forms = (checkTree . growZTree . zipifyTree) forms
+prove :: [Form] -> Bool
+prove forms = (isAllTrue . checkTree . accumulateTree [] . growZTree . zipifyTree) forms

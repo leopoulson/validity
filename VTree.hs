@@ -10,6 +10,7 @@ import Zipper
 
 data Tree a = Node a (Tree a) (Tree a) | Leaf 
   deriving Show
+
 type ZTree a = Tree (Zipper a) --ZTree is just used to save time typing
 
 instance Functor Tree where

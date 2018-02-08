@@ -29,3 +29,10 @@ isValid z
 notf :: Form -> Form
 notf (Not f) = f
 notf f = Not f
+
+-- Make this use a fold?
+isAllTrue :: Tree Bool -> Bool
+isAllTrue Leaf = True
+isAllTrue (Node v bl br) 
+  | v         = (isAllTrue bl) && (isAllTrue br)
+  | otherwise = False
