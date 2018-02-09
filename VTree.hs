@@ -46,19 +46,17 @@ applyZRule (Node z bl br) = case cursor z of
     Not (Or f1 f2)       -> Node (insert (Not f1) (insert (Not f2) (right z))) bl br
     Not (Cond f1 f2)     -> Node (insert f1 (insert (Not f2) (right z))) bl br
 
-    Or f1 f2             -> doubleZRule (Node (right z) bl br) (Or f1 f2)
-    Cond f1 f2           -> doubleZRule (Node (right z) bl br) (Cond f1 f2)
-    Not (And f1 f2)      -> doubleZRule (Node (right z) bl br) (Not (And f1 f2))
+    rule                 -> doubleZRule (Node (right z) bl br) rule
 
-    _                    -> Node (right z) bl br
-    
-    
 doubleZRule :: ZTree Form -> Form -> ZTree Form
 doubleZRule Leaf _ = Leaf  --This case shouldn't happen 
 doubleZRule (Node z Leaf Leaf) f = case f of 
-    Or f1 f2        -> Node z (Node (fromList [f1]) Leaf Leaf) (Node (fromList [f2]) Leaf Leaf)
-    Cond f1 f2      -> Node z (Node (fromList [Not f1]) Leaf Leaf) (Node (fromList [f2]) Leaf Leaf)
-    Not (And f1 f2) -> Node z (Node (fromList [Not (f1)]) Leaf Leaf) (Node (fromList [Not (f2)]) Leaf Leaf)
+    Or a b            -> Node z (Node (fromList [a]) Leaf Leaf) (Node (fromList [b]) Leaf Leaf)
+    Cond a b          -> Node z (Node (fromList [Not a]) Leaf Leaf) (Node (fromList [b]) Leaf Leaf)
+    Not (And a b)     -> Node z (Node (fromList [Not a]) Leaf Leaf) (Node (fromList [Not b]) Leaf Leaf)
+
+    Bicon a b         -> Node z (Node (fromList [a, b]) Leaf Leaf) (Node (fromList [Not a, Not b]) Leaf Leaf)
+    Not (Bicon a b)   -> Node z (Node (fromList [Not a, b]) Leaf Leaf) (Node (fromList [Not b, a]) Leaf Leaf)
 doubleZRule (Node z bl br) f = Node z (doubleZRule bl f) (doubleZRule br f)
 
 doubleNeg :: Form -> Form
