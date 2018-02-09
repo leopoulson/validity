@@ -17,7 +17,8 @@ instance Functor Tree where
     fmap f Leaf           = Leaf
     fmap f (Node a bl br) = Node (f a) (fmap f bl) (fmap f br)
 
-data Form = Var Char | Not Form | And Form Form | Or Form Form
+data Form = Var Char | Not Form | And Form Form | Or Form Form  
+          | Cond Form Form | Bicon Form Form
     deriving (Show, Eq)
     
 zipifyTree :: [Form] -> ZTree Form
@@ -43,8 +44,10 @@ applyZRule (Node z bl br) = case cursor z of
 
     And f1 f2            -> Node (insert f1 (insert f2 (right z))) bl br
     Not (Or f1 f2)       -> Node (insert (Not f1) (insert (Not f2) (right z))) bl br
+    Not (Cond f1 f2)     -> Node (insert f1 (insert (Not f2) (right z))) bl br
 
     Or f1 f2             -> doubleZRule (Node (right z) bl br) (Or f1 f2)
+    Cond f1 f2           -> doubleZRule (Node (right z) bl br) (Cond f1 f2)
     Not (And f1 f2)      -> doubleZRule (Node (right z) bl br) (Not (And f1 f2))
 
     _                    -> Node (right z) bl br
@@ -54,6 +57,7 @@ doubleZRule :: ZTree Form -> Form -> ZTree Form
 doubleZRule Leaf _ = Leaf  --This case shouldn't happen 
 doubleZRule (Node z Leaf Leaf) f = case f of 
     Or f1 f2        -> Node z (Node (fromList [f1]) Leaf Leaf) (Node (fromList [f2]) Leaf Leaf)
+    Cond f1 f2      -> Node z (Node (fromList [Not f1]) Leaf Leaf) (Node (fromList [f2]) Leaf Leaf)
     Not (And f1 f2) -> Node z (Node (fromList [Not (f1)]) Leaf Leaf) (Node (fromList [Not (f2)]) Leaf Leaf)
 doubleZRule (Node z bl br) f = Node z (doubleZRule bl f) (doubleZRule br f)
 
