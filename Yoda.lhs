@@ -82,8 +82,8 @@ parses, along with remaining unparsed strings.
 > parse :: Parser a -> (String -> [(String, a)])
 > parse (Parser p) = p
 
-> parseAll :: Parser a -> String -> [a]
-> parseAll p str = snd <$> parse (p <* eof) str
+> parseAll :: Parser a -> String -> a
+> parseAll p str = head (snd <$> parse (p <* eof) str)
 
 > parseMaybe :: Parser a -> String -> Maybe a
 > parseMaybe px ts = case parse px ts of
