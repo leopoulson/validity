@@ -11,4 +11,7 @@ main :: IO ()
 main = do
     putStrLn "Enter the formula to parse: "
     form <- getLine
-    print (parseAll formulas form)
+    let formParsed = (parseAndNegate form)
+    if (prove formParsed) then 
+        putStrLn "Valid argument!"
+    else putStrLn "Invalid argument :("
