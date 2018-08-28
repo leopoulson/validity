@@ -7,4 +7,4 @@ Todo:
 - Improvements to the parser; 
     - Add in an actual symbol for the last item in the list (e.g. ∴) to make sure that it's actually desired to be the conclusion
 - A syntax guide
-- Predicate logic!
+- First-order logic!
